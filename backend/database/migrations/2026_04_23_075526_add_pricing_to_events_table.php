@@ -1,0 +1,27 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::table('events', function (Blueprint $table) {
+            $table->string('price_type', 20)->default('free')->after('end_time'); // free, paid
+            $table->decimal('price_amount', 10, 2)->nullable()->after('price_type');
+            $table->string('ticket_url', 500)->nullable()->after('price_amount');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::table('events', function (Blueprint $table) {
+            $table->dropColumn(['price_type', 'price_amount', 'ticket_url']);
+        });
+    }
+};
