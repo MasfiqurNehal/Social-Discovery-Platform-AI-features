@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { AuthProvider } from "@/context/AuthContext";
 import { Providers } from "./providers";
 import "./globals.css";
@@ -18,19 +19,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head>
-        <script
+      <head />
+      <body className="antialiased min-h-screen flex flex-col" suppressHydrationWarning>
+        <Script
+          id="theme-init"
+          strategy="beforeInteractive"
           dangerouslySetInnerHTML={{
-            __html: `
-              try {
-                const theme = localStorage.getItem('vibespot-theme') || 'dark';
-                document.documentElement.classList.add(theme);
-              } catch (e) {}
-            `,
+            __html: `try{var t=localStorage.getItem('vibespot-theme')||'dark';document.documentElement.classList.add(t);}catch(e){}`,
           }}
         />
-      </head>
-      <body className="antialiased min-h-screen flex flex-col" suppressHydrationWarning>
         <AuthProvider>
           <Providers>
             <Navbar />

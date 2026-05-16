@@ -144,6 +144,20 @@ class MassiveProductionSeeder extends Seeder
         ");
     }
 
+    private array $categoryImages = [
+        'Food & Drinks'        => 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1200&q=80',
+        'Landmarks & Heritage' => 'https://images.unsplash.com/photo-1564507592333-c60657eea523?auto=format&fit=crop&w=1200&q=80',
+        'Outdoors'             => 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=1200&q=80',
+        'Culture'              => 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?auto=format&fit=crop&w=1200&q=80',
+        'Shopping'             => 'https://images.unsplash.com/photo-1555529669-e69e7aa0ba9a?auto=format&fit=crop&w=1200&q=80',
+        'Cinema & Screenings'  => 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1200&q=80',
+        'Nightlife'            => 'https://images.unsplash.com/photo-1566737236500-c8ac43014a67?auto=format&fit=crop&w=1200&q=80',
+        'Wellness'             => 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=1200&q=80',
+        'Family & Kids'        => 'https://images.unsplash.com/photo-1530103862676-de8c9debad1d?auto=format&fit=crop&w=1200&q=80',
+        'Sports & Fitness'     => 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=1200&q=80',
+        'Entertainment'        => 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=1200&q=80',
+    ];
+
     private function seedPlaces(int $count): void
     {
         $categoryMap = $this->categoryIdMap('place');
@@ -153,6 +167,7 @@ class MassiveProductionSeeder extends Seeder
         $adjectives = $this->sqlArray(['North', 'Golden', 'Skyline', 'Urban', 'Riverfront', 'Garden', 'Lakeside', 'Heritage', 'Sunset', 'Metro']);
         $nouns = $this->sqlArray(['Cafe', 'Lounge', 'Market', 'Gallery', 'Park', 'Plaza', 'Studio', 'Bistro', 'Arena', 'Collective']);
         $categoryCase = $this->categoryCaseSql($categoryMap, 'category_name');
+        $categoryImageCase = $this->categoryImageCaseSql('category_name');
         $categoriesSql = $this->sqlArray($categories);
 
         $this->statement("
@@ -171,7 +186,7 @@ class MassiveProductionSeeder extends Seeder
                 round((23.55 + ((gs % 4000) / 10000.0))::numeric, 7),
                 round((90.35 + ((gs % 5000) / 10000.0))::numeric, 7),
                 'Popular ' || lower(category_name) || ' destination known for strong community ratings, dependable service, and social-friendly ambience.',
-                'https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=1200&q=80',
+                {$categoryImageCase},
                 jsonb_build_array(
                     'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1200&q=80',
                     'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1200&q=80'
@@ -615,6 +630,18 @@ class MassiveProductionSeeder extends Seeder
         }
 
         return $case . ' END';
+    }
+
+    private function categoryImageCaseSql(string $column): string
+    {
+        $default = 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=1200&q=80';
+        $case = 'CASE';
+
+        foreach ($this->categoryImages as $name => $url) {
+            $case .= " WHEN {$column} = '" . str_replace("'", "''", $name) . "' THEN '" . str_replace("'", "''", $url) . "'";
+        }
+
+        return $case . " ELSE '{$default}' END";
     }
 
     private function sqlArray(array $values): string
